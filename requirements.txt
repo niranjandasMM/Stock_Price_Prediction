@@ -168,7 +168,6 @@ PyDispatcher==2.0.7
 pydot==1.4.2
 pyee==9.0.4
 pyerfa==2.0.0.1
-PyGetWindow==0.0.9
 Pygments==2.14.0
 Pympler==1.0.1
 PyMsgBox==1.0.9
@@ -188,7 +187,6 @@ pytz-deprecation-shim==0.1.0.post0
 pyvespa==0.31.0
 pyvo==1.4
 PyWavelets==1.4.1
-pywinpty==2.0.10
 PyYAML==6.0
 pyzmq==25.0.2
 qtconsole==5.4.0
