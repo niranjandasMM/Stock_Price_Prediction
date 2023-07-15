@@ -12,7 +12,18 @@ from train import MultipleLinearRegression
 from data import get_data_and_preprocess
 from sklearn.metrics import r2_score
 from matplotlib.animation import FuncAnimation
-from streamlit import components
+
+# Set the page configuration
+st.set_page_config(
+    page_title="Stock Price Prediction App",
+    layout="wide",  # Use wide layout to maximize space
+    initial_sidebar_state="auto",
+    menu_items={
+        'Get Help': 'https://www.example.com/help',
+        'Report a Bug': "https://www.example.com/bug",
+        'About': "# Stock Price Prediction App\n\n https://github.com/niranjandasMM/Stock_Price_Prediction"    },
+    page_icon=None
+)
 
 print(f"Hey app started....")
 st.markdown("<div align='center'><h1 style='font-weight: bold'> Stock Price Prediction App</h1></div>", unsafe_allow_html=True)
@@ -57,6 +68,38 @@ while current_date <= end_date:
         date_range.append(current_date.strftime('%Y-%m-%d'))
     current_date += timedelta(days=1)
 
+# Define the list of stock symbols for American market
+american = [
+    'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'TSLA', 'NVDA', 'NFLX', 'INTC', 'CSCO',
+    'ADBE', 'AMGN', 'AMAT', 'ADSK', 'BAC', 'BIIB', 'BKNG', 'AVGO', 'CELG', 'CHTR',
+    'CMG', 'COST', 'CSCO', 'INTC', 'INTU', 'JPM', 'MA', 'MRK', 'NFLX', 'NVDA',
+    'PYPL', 'SBUX', 'TMUS', 'TXN', 'V', 'WMT', 'XOM'
+]
+
+# Define the list of stock symbols for Indian market
+indian = [
+    'RELIANCE.NS', 'TCS.NS', 'HDFCBANK.NS', 'INFY.NS', 'HINDUNILVR.NS', 'SBIN.NS',
+    'ITC.NS', 'ICICIBANK.NS', 'KOTAKBANK.NS', 'HDFC.NS', 'LT.NS', 'AXISBANK.NS',
+    'ONGC.NS', 'WIPRO.NS', 'ASIANPAINT.NS', 'NESTLEIND.NS', 'BAJAJ-AUTO.NS',
+    'BAJFINANCE.NS', 'HINDALCO.NS', 'HCLTECH.NS', 'MARUTI.NS', 'COALINDIA.NS',
+    'JSWSTEEL.NS', 'ITC.NS', 'ADANIPORTS.NS', 'BHARTIARTL.NS', 'CIPLA.NS',
+    'GRASIM.NS', 'INFY.NS', 'IOC.NS', 'RELIANCE.NS', 'SUNPHARMA.NS', 'TCS.NS',
+    'TECHM.NS', 'TITAN.NS', 'UPL.NS', 'VEDL.NS', 'WIPRO.NS', 'BANKBARODA.NS'
+]
+
+# Create the select box for country
+selected_country = st.selectbox('Select Country', ['American', 'Indian'])
+
+# Create the select box for stock symbol based on the selected country
+if selected_country == 'American':
+    selected_symbol = st.selectbox('Select Stock Symbol', american)
+else:
+    selected_symbol = st.selectbox('Select Stock Symbol', indian)
+
+# Display the selected country and stock symbol
+st.write("Selected Country:", selected_country)
+st.write("Selected Stock Symbol:", selected_symbol)
+
 # Create select boxes for start date and end date
 start_date = st.selectbox('Select Start Date', date_range)
 end_date = st.selectbox('Select End Date', date_range)
@@ -66,7 +109,7 @@ st.write("Selected Start Date:", start_date)
 st.write("Selected End Date:", end_date)
 
 if st.button('Submit'):
-    X_train, y_train, X_test, y_test = get_data_and_preprocess(stock_symbol='BANKBARODA.NS',
+    X_train, y_train, X_test, y_test = get_data_and_preprocess(stock_symbol=selected_symbol,
                                                             start_date=start_date, 
                                                             end_date=end_date)
 
@@ -79,6 +122,7 @@ if st.button('Submit'):
 
 
     st.title('Training (9:15AM -1:30PM) and Testing(1:30PM - 3:30PM)  Predicted vs Actual Stock Prices')
+    # Create the figure
     fig, ax = plt.subplots(figsize=(18, 10))
     ax.plot(X_train['Datetime'], y_hat, label='Predicted (Train)', color='green')
     ax.plot(X_train['Datetime'], y_train, label='Actual (Train)', color='darkblue')

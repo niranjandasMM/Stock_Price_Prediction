@@ -51,14 +51,14 @@ class MultipleLinearRegression:
 
             self.optimize(x_train, y_pred, y_train, learning_rate=0.001)
 
-            if epoch % 100 == 0:
-                st.write(f"I: {epoch} Train-Err: {loss / float(len(x_train)):.5f}")
-                # sys.stdout.write(
-                #     "\n"
-                #     + "I:" + str(epoch)
-                #     + " Train-Err:" + str(loss / float(len(x_train)))[0:5]
-                #     + "\n"
-                # )
+            # if epoch % 100 == 0:
+            #     st.write(f"Epochs: {epoch} Train-Err: {loss / float(len(x_train)):.5f}")
+            #     # sys.stdout.write(
+            #     #     "\n"
+            #     #     + "I:" + str(epoch)
+            #     #     + " Train-Err:" + str(loss / float(len(x_train)))[0:5]
+            #     #     + "\n"
+            #     # )
 
         # Initialize an empty list to store the data
         data = []
