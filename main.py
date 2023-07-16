@@ -35,7 +35,9 @@ content = """
 The data is fetched from </span> <span style='color:blue'><b>Yahoo Finance</b></span> <span style='color:purple'> and then the model is trained for the first <b>4.25 hours</b> of data.
 The model is trained on the data from <b>9:15 AM to 1:30 PM</b> and tested on the data from <b>1:30 PM to 3:30 PM</b>.
 The model primarily predicts for day trading.
-NOTE: It can't forecast future prices, this model can only predict prices based on historical data. </span>
+NOTE: It can't forecast future prices, this model can only predict prices based on historical data.
+ It requires features (X_test) to make predictions on new, unseen data.
+ </span>
 """
 
 # Show an expander to toggle visibility
@@ -68,13 +70,6 @@ while current_date <= end_date:
         date_range.append(current_date.strftime('%Y-%m-%d'))
     current_date += timedelta(days=1)
 
-# Define the list of stock symbols for American market
-american = [
-    'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'TSLA', 'NVDA', 'NFLX', 'INTC', 'CSCO',
-    'ADBE', 'AMGN', 'AMAT', 'ADSK', 'BAC', 'BIIB', 'BKNG', 'AVGO', 'CELG', 'CHTR',
-    'CMG', 'COST', 'CSCO', 'INTC', 'INTU', 'JPM', 'MA', 'MRK', 'NFLX', 'NVDA',
-    'PYPL', 'SBUX', 'TMUS', 'TXN', 'V', 'WMT', 'XOM'
-]
 
 # Define the list of stock symbols for Indian market
 indian = [
@@ -88,16 +83,9 @@ indian = [
 ]
 
 # Create the select box for country
-selected_country = st.selectbox('Select Country', ['American', 'Indian'])
 
-# Create the select box for stock symbol based on the selected country
-if selected_country == 'American':
-    selected_symbol = st.selectbox('Select Stock Symbol', american)
-else:
-    selected_symbol = st.selectbox('Select Stock Symbol', indian)
+selected_symbol = st.selectbox('Select Stock Symbol', indian)
 
-# Display the selected country and stock symbol
-st.write("Selected Country:", selected_country)
 st.write("Selected Stock Symbol:", selected_symbol)
 
 # Create select boxes for start date and end date
