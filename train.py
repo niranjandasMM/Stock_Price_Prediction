@@ -1,77 +1,75 @@
-import sys
 import numpy as np
-import pandas as pd 
-import streamlit as st
-import matplotlib.pyplot as plt
-from sklearn.metrics import r2_score
+import pandas as pd
+import sys
 
+from sklearn.metrics import mean_squared_error
 
-def mse(y_pred, label):
-    return np.mean((y_pred-label)**2)
+class PolynomialRegression:
+    def __init__(self, degrees):
+        self.degrees = degrees
+        self.w = 0
+        self.b = 0
 
-class MultipleLinearRegression:
-    def __init__(self):
-        self.b0 = 0
-        self.b1 = 0
-        self.b2 = 0
-        self.b3 = 0
-        self.b4 = 0
-    
-    def optimize(self, x,  y_pred, y_train, learning_rate):
-        error = [ (y_train[i] - y_pred[i] ) for i in range(len(x)) ]
+    def gradients(self, X, X_transformed,  y_train, y_pred, lr):
+        m = X.shape[0]  ##(1000,3)
+        error = y_pred - y_train
+        # print(f" shape is : {X.shape, self.w.shape, error.shape}") ## ((3, 3), (6, 1), (3, 1))
+        
+        dw = (1/m) * np.dot(X_transformed.T, error)
+        db = (1/m) * np.sum(error)
 
-        for i in range(len(x)):
-            self.b1 += learning_rate * x[i][0] * error[i]
-            self.b2 += learning_rate * x[i][1] * error[i]
-            self.b3 += learning_rate * x[i][2] * error[i]
-            self.b4 += learning_rate * x[i][3] * error[i]
-            self.b0 += learning_rate * error[i]
+        self.w -= lr * dw
+        self.b -= lr * db
 
-    def predict(self,x, test=False):
+    def predict(self, X, test=False):
         if test:
-            x = x[['Open', 'High', 'Low', 'Volume']]
-            x = np.array(x)
-            y_pred = [self.b0 + ( (self.b1 * xi[0]) + (self.b2 * xi[1]) + (self.b3 * xi[2]) + (self.b4 * xi[3]) ) for xi in x]
-            return y_pred
+            X_transformed = self.x_transform(X)
+            return np.dot(X_transformed, self.w) + self.b
         else:
-            y_pred = [self.b0 + ( (self.b1 * xi[0]) + (self.b2 * xi[1]) + (self.b3 * xi[2]) + (self.b4 * xi[3]) ) for xi in x]
-            return y_pred
-        
-    def train(self, X_train, y_train, epochs):
-        x_train = X_train[['Open', 'High', 'Low', 'Volume']] 
-        x_train = np.array(x_train)
-        y_train = np.array(y_train)
-        
-        loss_list = []
+            return np.dot(X, self.w) + self.b
 
+    def train(self, X_train, y_train, epochs, lr):
+        X_transformed = self.x_transform(X_train)
+        m, n = X_transformed.shape  ## no. of samples, no. of features
+
+        self.w = np.zeros((n, 1))  
+        self.b = 0
+        losses = []
+        
         for epoch in range(epochs):
-            y_pred = self.predict(x_train)
-            loss = mse(y_pred, y_train)
-            loss_list.append(loss)
+            # y_pred = w1*x1 + w2*x1^2 + w3*x2 + w4*x2^2 + w5*x3 + w6*x3^2 + b ## degree = 2
+            y_pred = self.predict(X_transformed)
+            self.gradients(X_train, X_transformed, y_train, y_pred, lr)
+            # print(f"self.w and self.b are : {self.w, self.b}")
 
-            self.optimize(x_train, y_pred, y_train, learning_rate=0.001)
+            loss = mean_squared_error(y_train, y_pred) 
+            
+            if epoch % 10 == 0:
+                # Initialize an empty list to store the data for the maximum difference
+                data = []
 
-            # if epoch % 100 == 0:
-            #     st.write(f"Epochs: {epoch} Train-Err: {loss / float(len(x_train)):.5f}")
-            #     # sys.stdout.write(
-            #     #     "\n"
-            #     #     + "I:" + str(epoch)
-            #     #     + " Train-Err:" + str(loss / float(len(x_train)))[0:5]
-            #     #     + "\n"
-            #     # )
+                # Iterate over the predictions and actual values
+                for x, y in zip(y_pred, y_train):
+                    diff = abs(x - y)  # Calculate the absolute difference
+                    data.append({"y_predicted": x, "actual": y, "difference": diff})
 
-        # Initialize an empty list to store the data
-        data = []
+                # Create the DataFrame outside the loop
+                df = pd.DataFrame(data)
+                # print(df)
+                max_diff = df['difference'].max()
+                
+                sys.stdout.write(
+                    "\n" +
+                    "I:" + str(epoch) +
+                    " Train-Err:" + str(loss / float(len(X_train)))[0:5] +
+                    " MAX Difference: " + str(max_diff) +
+                    "\n"
+                )
 
-        for x, y in zip(y_pred, y_train):
-            diff = abs(x - y) 
-            data.append({"y_pred": x, "y_train": y, "difference": diff})
 
-        df = pd.DataFrame(data)
-        max_diff = df['difference'].max()
-        st.write("MAX Difference:", max_diff)
+    def x_transform(self, X):
+        t = X.copy()
+        for i in self.degrees:
+            X_transformed = np.append(X, t**i, axis=1)
+        return X_transformed
 
-        r2 = r2_score(y_train, y_pred)
-        st.write(" Training R2 Score:", r2)
-
-        return y_pred
