@@ -13,7 +13,7 @@ from data import x_train, x_test, y_train, y_test
 degree = [2]
 
 model = PolynomialRegression(degrees=degree)
-model.train(x_train, y_train, epochs=1000, lr=0.01)
+model.train(x_train, y_train, epochs=1500, lr=0.9)
 
 y_test_pred = model.predict(x_test, test=True)
 print(f"r2 score  is : {r2_score(y_test, y_test_pred)}")

@@ -3,6 +3,7 @@ import pandas as pd
 import sys
 
 from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
 
 class PolynomialRegression:
     def __init__(self, degrees):
@@ -44,7 +45,7 @@ class PolynomialRegression:
 
             loss = mean_squared_error(y_train, y_pred) 
             
-            if epoch % 10 == 0:
+            if epoch % 100 == 0:
                 # Initialize an empty list to store the data for the maximum difference
                 data = []
 
@@ -65,7 +66,7 @@ class PolynomialRegression:
                     " MAX Difference: " + str(max_diff) +
                     "\n"
                 )
-
+        print(f" training r2 score is : {r2_score(y_train, y_pred)}")
 
     def x_transform(self, X):
         t = X.copy()
